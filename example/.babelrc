@@ -1,0 +1,9 @@
+{
+  "plugins": [
+    "@babel/plugin-syntax-jsx",
+    ["../lib", {
+      "components": ["Box", "Button"],
+      "parentsToExclude": ["Box", "Button"]
+    }]
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "version": "1.0.0",
+  "repository": "babel-plugin-react-append-displayName",
+  "description": "Add component name as a className of first component in the render tree",
+  "author": "Sabarni Das <sabarni.d@media.net>",
+  "main": "lib/index.js",
+  "devDependencies": {
+    "@babel/cli": "^7.24.5",
+    "@babel/core": "^7.24.5",
+    "@babel/plugin-syntax-jsx": "^7.24.1",
+    "@babel/preset-env": "^7.24.5",
+    "@babel/register": "^7.23.7",
+    "mocha": "^3.1.2"
+  },
+  "scripts": {
+    "clean": "rm -rf lib",
+    "build": "babel src -d lib",
+    "example": "npm run build && babel example/input.js -o example/output.js",
+    "test": "mocha --compilers js:@babel/register",
+    "test:watch": "npm run test -- --watch",
+    "prepublish": "npm run clean && npm run build"
+  },
+  "keywords": [
+    "babel",
+    "plugin",
+    "styled-components",
+    "babel-plugin",
+    "react",
+    "class"
+  ],
+  "dependencies": {
+    "babel-preset-env": "^1.7.0"
+  }
+}
