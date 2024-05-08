@@ -27,7 +27,7 @@ This plugin will append `UserPanel` to class.
 First, install the plugin via npm or yarn:
 
 ```bash
-npm install --save-dev babel-plugin-react-append-displayName
+npm install --save-dev babel-plugin-react-append-displayname
 ```
 
 ### Configuration in .babelrc or babel.config.js
@@ -37,7 +37,7 @@ npm install --save-dev babel-plugin-react-append-displayName
   "plugins": [
     "@babel/preset-react",
     [
-      "babel-plugin-react-append-displayName",
+      "babel-plugin-react-append-displayname",
       {
         "components": ["Box", "Button"],
         "parentsToExclude": ["Box", "Button"]
