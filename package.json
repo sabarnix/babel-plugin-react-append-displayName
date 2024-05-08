@@ -1,6 +1,6 @@
 {
   "version": "1.0.0",
-  "repository": "babel-plugin-react-append-displayName",
+  "repository": "https://github.com/sabarnix/babel-plugin-react-append-displayName.git",
   "description": "Add component name as a className of first component in the render tree",
   "author": "Sabarni Das <sabarni.d@media.net>",
   "main": "lib/index.js",
