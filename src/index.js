@@ -5,7 +5,6 @@ module.exports = function ({ types: t }) {
       const parentComponentName = parentComponentStack[parentComponentStack.length - 1];
       const componentName = path.node.name.name;
       if (isRootComponent && parentComponentName) {
-        console.log(componentName, parentComponentName);
         // Check if it matches config
         const matched = (Array.isArray(config.components) ? config.components.includes(componentName) : config.components === componentName) &&
         (Array.isArray(config.parentsToExclude) ? !config.parentsToExclude.includes(parentComponentName) : config.parentsToExclude !== parentComponentName);
