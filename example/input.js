@@ -6,6 +6,9 @@ let tips = [
 import React from 'react';
 
 const DummyComponent = () => {
+
+  const x = () => (<Box>x</Box>)
+
   return (
     <Box className="superBox">
       <Box></Box>

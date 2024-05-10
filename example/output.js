@@ -1,6 +1,7 @@
 let tips = ["Paste or drop some JavaScript here and explore the syntax tree created by chosen parser.", "You can use all the cool new features from ES6 and even more. Enjoy!"];
 import React from 'react';
 const DummyComponent = () => {
+  const x = () => <Box className="DummyComponent x">x</Box>;
   return <Box className="superBox DummyComponent">
       <Box></Box>
       <Box></Box>

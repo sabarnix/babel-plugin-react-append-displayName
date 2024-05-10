@@ -1,10 +1,10 @@
 module.exports = function ({ types: t }) {
   const childVisitor = {
-    JSXOpeningElement(path, state) {
-      const { parentComponentStack, config, isRootComponent } = state;
+    JSXElement(path, state) {
+      const { parentComponentStack, config } = state;
       const parentComponentName = parentComponentStack[parentComponentStack.length - 1];
-      const componentName = path.node.name.name;
-      if (isRootComponent && parentComponentName) {
+      const componentName = path.node.openingElement.name.name;
+      if (componentName && parentComponentName && !path.parentPath.isJSXElement()) {
         // Check if it matches config
         const matched = (Array.isArray(config.components) ? config.components.includes(componentName) : config.components === componentName) &&
         (Array.isArray(config.parentsToExclude) ? !config.parentsToExclude.includes(parentComponentName) : config.parentsToExclude !== parentComponentName);
@@ -15,7 +15,7 @@ module.exports = function ({ types: t }) {
           // Apply the matched rule to add className attribute
 
           // Check if className attribute already exists
-          const classNameAttribute = path.node.attributes.find(
+          const classNameAttribute = path.node.openingElement.attributes.find(
             (attr) => attr.name && attr.name.name === 'className'
           );
 
@@ -27,7 +27,7 @@ module.exports = function ({ types: t }) {
             );
 
             // Append the new className attribute to the JSX element
-            path.node.attributes.push(newClassNameAttribute);
+            path.node.openingElement.attributes.push(newClassNameAttribute);
           } else {
             // Append classNameToAdd to the existing className, if not already included
             const currentClassName = classNameAttribute.value.value;
@@ -38,7 +38,6 @@ module.exports = function ({ types: t }) {
             }
           }
         }
-        state.isRootComponent = false;
       }
     },
   };
@@ -51,8 +50,6 @@ module.exports = function ({ types: t }) {
 
         // Initialize parent component name stack
         state.parentComponentStack = [];
-
-        state.isRootComponent = true;
 
         // Store config in plugin state
         state.config = {
