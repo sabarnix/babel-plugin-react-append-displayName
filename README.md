@@ -20,6 +20,17 @@ function UserPanel({ name }) {
 This component will render div with class `Box-sc-*` which is not helpful.
 This plugin will append `UserPanel` to class.
 
+```jsx
+function UserPanel({ name }) {
+  return (
+    <Box padding="medium" className="UserPanel">
+      <h1>Hello ${name}</h1>
+    </Box>
+  )
+}
+
+```
+
 ## Getting Started
 
 ### Installing
