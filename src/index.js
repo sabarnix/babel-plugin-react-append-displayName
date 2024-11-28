@@ -1,88 +1,144 @@
 module.exports = function ({ types: t }) {
+  // Utility function to validate configuration
+  function validateConfig(config) {
+    if (!config) {
+      throw new Error('Plugin configuration is required');
+    }
+
+    if (!config.components) {
+      throw new Error('components configuration is required');
+    }
+
+    if (!(Array.isArray(config.components) || typeof config.components === 'string')) {
+      throw new Error('components must be an array or string');
+    }
+
+    if (config.parentsToExclude &&
+        !(Array.isArray(config.parentsToExclude) || typeof config.parentsToExclude === 'string')) {
+      throw new Error('parentsToExclude must be an array or string');
+    }
+  }
+
   const childVisitor = {
     JSXElement(path, state) {
-      const { parentComponentStack, config } = state;
-      const parentComponentName = parentComponentStack[parentComponentStack.length - 1];
-      const componentName = path.node.openingElement.name.name;
-      if (componentName && parentComponentName && !path.parentPath.isJSXElement()) {
+      try {
+        const { parentComponentStack, config } = state;
+
+        if (!parentComponentStack || !Array.isArray(parentComponentStack)) {
+          throw new Error('Invalid parent component stack');
+        }
+
+        const parentComponentName = parentComponentStack[parentComponentStack.length - 1];
+
+        if (!path.node.openingElement || !path.node.openingElement.name) {
+          return; // Skip if invalid element structure
+        }
+
+        const componentName = path.node.openingElement.name.name;
+
+        if (!componentName || !parentComponentName || path.parentPath.isJSXElement()) {
+          return; // Early return for invalid cases
+        }
+
         // Check if it matches config
-        const matched = (Array.isArray(config.components) ? config.components.includes(componentName) : config.components === componentName) &&
-        (Array.isArray(config.parentsToExclude) ? !config.parentsToExclude.includes(parentComponentName) : config.parentsToExclude !== parentComponentName);
+        const matched = (Array.isArray(config.components)
+          ? config.components.includes(componentName)
+          : config.components === componentName) &&
+          (Array.isArray(config.parentsToExclude)
+            ? !config.parentsToExclude.includes(parentComponentName)
+            : config.parentsToExclude !== parentComponentName);
+
+        if (!matched) {
+          return;
+        }
 
         const classNameToAdd = parentComponentName;
 
-        if (matched) {
-          // Apply the matched rule to add className attribute
-
-          // Check if className attribute already exists
+        // Safely handle attribute modification
+        try {
           const classNameAttribute = path.node.openingElement.attributes.find(
-            (attr) => attr.name && attr.name.name === 'className'
+            (attr) => attr && attr.name && attr.name.name === 'className'
           );
 
           if (!classNameAttribute) {
-            // Create a new className attribute with the specified classNameToAdd
             const newClassNameAttribute = t.jsxAttribute(
               t.jsxIdentifier('className'),
               t.stringLiteral(classNameToAdd)
             );
-
-            // Append the new className attribute to the JSX element
             path.node.openingElement.attributes.push(newClassNameAttribute);
           } else {
-            // Append classNameToAdd to the existing className, if not already included
-            const currentClassName = classNameAttribute.value.value;
+            // Safely handle existing className
+            const currentClassName = classNameAttribute.value?.value || '';
             if (!currentClassName.includes(classNameToAdd)) {
               classNameAttribute.value = t.stringLiteral(
-                `${currentClassName} ${classNameToAdd}`
+                `${currentClassName} ${classNameToAdd}`.trim()
               );
             }
           }
+        } catch (attributeError) {
+          console.error('Error modifying className attribute:', attributeError);
         }
+      } catch (visitorError) {
+        console.error('Error in JSXElement visitor:', visitorError);
       }
     },
   };
 
   return {
     visitor: {
-      Program(path, state) {
-        // Read config from Babel configuration
-        const { components, parentsToExclude } = state.opts;
+      Program: {
+        enter(path, state) {
+          try {
+            // Validate configuration
+            validateConfig(state.opts);
 
-        // Initialize parent component name stack
-        state.parentComponentStack = [];
+            // Initialize state with defaults
+            state.parentComponentStack = [];
+            state.config = {
+              components: state.opts.components || [],
+              parentsToExclude: state.opts.parentsToExclude || [],
+            };
 
-        // Store config in plugin state
-        state.config = {
-          components,
-          parentsToExclude,
-        };
-
-        // Traverse the program with the childVisitor
-        path.traverse(childVisitor, state);
+            path.traverse(childVisitor, state);
+          } catch (error) {
+            console.error('Error initializing plugin:', error);
+            throw error; // Fail the build if configuration is invalid
+          }
+        },
       },
+
       FunctionDeclaration(path, state) {
-        // Track parent component name for function components
-        const { parentComponentStack } = state;
-        const componentName = path.node.id.name;
-        parentComponentStack.push(componentName);
+        try {
+          const { parentComponentStack } = state;
+          const componentName = path.node.id?.name;
 
-        // Continue traversal
-        path.traverse(childVisitor, state);
+          if (!componentName) {
+            return; // Skip if no valid component name
+          }
 
-        // Pop the component name when exiting
-        parentComponentStack.pop();
+          parentComponentStack.push(componentName);
+          path.traverse(childVisitor, state);
+          parentComponentStack.pop();
+        } catch (error) {
+          console.error('Error in FunctionDeclaration visitor:', error);
+        }
       },
+
       VariableDeclarator(path, state) {
-        // Track parent component name for variable-declared components
-        const { parentComponentStack } = state;
-        const componentName = path.node.id.name;
-        parentComponentStack.push(componentName);
+        try {
+          const { parentComponentStack } = state;
+          const componentName = path.node.id?.name;
 
-        // Continue traversal
-        path.traverse(childVisitor, state);
+          if (!componentName) {
+            return; // Skip if no valid component name
+          }
 
-        // Pop the component name when exiting
-        parentComponentStack.pop();
+          parentComponentStack.push(componentName);
+          path.traverse(childVisitor, state);
+          parentComponentStack.pop();
+        } catch (error) {
+          console.error('Error in VariableDeclarator visitor:', error);
+        }
       },
     },
   };

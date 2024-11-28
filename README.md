@@ -1,10 +1,12 @@
 # babel-plugin-react-append-displayName
 
-Add component name as a className of first component in the render tree.
+Babel plugin that automatically adds className attributes to React components based on their parent component names.
 
 ## Description
 
-When using Atomic components like Box, Button etc with styledComponents the classNames usually have the atomic component name which creates a hard to debug DOM tree.
+It helps in automatically adding CSS class names to React components based on their parent component's name
+
+This can be useful for styling and debugging by making component relationships visible in the DOM
 
 ```jsx
 function UserPanel({ name }) {
@@ -51,15 +53,15 @@ npm install --save-dev babel-plugin-react-append-displayname
       "babel-plugin-react-append-displayname",
       {
         "components": ["Box", "Button"],
-        "parentsToExclude": ["Box", "Button"]
+        "parentsToExclude": ["Box"]
       }
     ]
   ]
 }
 ```
 
-- components: the list of components which when appears first in the tree will get the display name of parent appended as className
-- parentsToExclude: list of comnponents to be ignored when present as parent.
+- components: List of components that should receive the className
+- parentsToExclude: List of parent components to skip
 
 ## Acknowledgments
 
