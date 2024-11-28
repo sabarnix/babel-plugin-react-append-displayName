@@ -1,5 +1,5 @@
 {
-  "version": "1.0.2",
+  "version": "1.0.3",
   "name": "babel-plugin-react-append-displayname",
   "repository": "https://github.com/sabarnix/babel-plugin-react-append-displayName.git",
   "description": "Add component name as a className of first component in the render tree",
@@ -31,5 +31,6 @@
   ],
   "dependencies": {
     "babel-preset-env": "^1.7.0"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha1.ac34549e6aa8e7ead463a7407e1c7390f61a6610"
 }
