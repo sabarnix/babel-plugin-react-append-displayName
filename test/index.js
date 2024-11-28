@@ -8,7 +8,7 @@ function trim(str) {
   return str.replace(/^\s+|\s+$/, '');
 }
 
-describe('Add a description for the plugin here', () => {
+describe('Expect className of parent to be added to child', () => {
   const fixturesDir = path.join(__dirname, 'fixtures');
   fs.readdirSync(fixturesDir).map((caseName) => {
     it(`should ${caseName.split('-').join(' ')}`, () => {
